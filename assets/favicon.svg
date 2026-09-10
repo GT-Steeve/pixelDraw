@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+  <!-- pixels déjà dessinés (bas gauche) -->
+  <rect x="1"  y="13" width="2" height="2" fill="#ff4fa3"/>
+  <rect x="3"  y="13" width="2" height="2" fill="#ffc15e"/>
+  <rect x="1"  y="11" width="2" height="2" fill="#b4ff39"/>
+  <rect x="5"  y="13" width="2" height="2" fill="#b4ff39"/>
+  <!-- crayon en escalier (haut droite vers le centre) -->
+  <rect x="12" y="1"  width="3" height="3" fill="#8b909c"/>
+  <rect x="10" y="3"  width="3" height="3" fill="#eef0f3"/>
+  <rect x="8"  y="5"  width="3" height="3" fill="#eef0f3"/>
+  <rect x="6"  y="7"  width="3" height="3" fill="#ffc15e"/>
+  <!-- pointe -->
+  <rect x="5"  y="9"  width="2" height="2" fill="#ff4fa3"/>
+</svg>
