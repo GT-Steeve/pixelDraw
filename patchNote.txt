@@ -1,2 +1,3 @@
-Prototype 
+Prototype
 v0.00.1 = first commit
+v0.00.2 = intégration ancien version

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Pixel Draw</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&family=Press+Start+2P&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div class="console">
+  <div class="paint-strip"></div>
+  <div class="stage">
+
+    <section id="screen-title" class="screen">
+      <div class="logo-pixels" id="mascot"></div>
+      <div class="wordmark">PIX<span>ART</span><br>PUZZLE</div>
+      <p class="tagline">Choisis une couleur, pose-la au bon endroit, et fais apparaître le dessin caché — pixel par pixel.</p>
+      <div class="cta-blink">Touche ici pour commencer</div>
+    </section>
+
+    <section id="screen-select" class="screen" hidden>
+      <div class="select-head">
+        <div>
+          <h2>Choisis ton dessin</h2>
+          <div class="select-sub" id="select-sub"></div>
+        </div>
+        <div class="pager">
+          <button class="round-btn" id="page-prev" aria-label="Page précédente">◀</button>
+          <div class="page-dots" id="page-indicator">1 / 3</div>
+          <button class="round-btn" id="page-next" aria-label="Page suivante">▶</button>
+        </div>
+      </div>
+      <div class="puzzle-grid" id="puzzle-grid"></div>
+      <p class="note">9 dessins jouables aujourd'hui · d'autres arrivent bientôt 🎨</p>
+    </section>
+
+    <section id="screen-draw" class="screen" hidden>
+      <div class="draw-top">
+        <button class="round-btn" id="btn-back-top" aria-label="Retour">←</button>
+        <div class="draw-title">
+          <span class="name" id="draw-name">—</span>
+          <span class="pill" id="draw-diff">Easy</span>
+        </div>
+        <div class="counter">
+          <span class="num" id="draw-remaining">0</span>
+          <span class="lbl">restants</span>
+        </div>
+      </div>
+
+      <div class="draw-body">
+        <div class="ref-panel">
+          <span class="lbl">Modèle</span>
+          <canvas id="ref-canvas"></canvas>
+          <span class="ref-total" id="ref-total">0 pixels</span>
+        </div>
+
+        <div class="grid-wrap" id="grid-wrap">
+          <canvas id="main-canvas"></canvas>
+          <canvas id="fx-canvas" class="overlay-canvas"></canvas>
+          <div class="toast" id="toast"></div>
+          <div class="win-overlay" id="win-overlay">
+            <canvas class="win-canvas" id="win-canvas"></canvas>
+            <h2>🎉 Terminé !</h2>
+            <p class="tagline" id="win-sub">Bravo, le dessin est complet.</p>
+            <div class="win-actions">
+              <button class="btn-primary" id="win-next">Dessin suivant</button>
+              <button class="btn-ghost" id="win-back">Retour aux dessins</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="palette-rail" id="palette-rail"></div>
+      </div>
+
+      <div class="tools">
+        <button class="tool-btn erase" id="btn-erase"><span class="ico">🧽</span>Effacer</button>
+        <button class="tool-btn hint" id="btn-hint"><span class="ico">💡</span>Solution</button>
+        <button class="tool-btn back" id="btn-back-bottom"><span class="ico">↩</span>Retour</button>
+        <button class="tool-btn cheat" id="btn-cheat"><span class="ico">✓</span>Terminer (démo)</button>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script src="assets/js/app.js"></script>
+</body>
+</html>

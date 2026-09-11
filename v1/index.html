@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Pixel Draw</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Nunito:wght@400;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div class="wrap">
+  <div class="card">
+    <div class="nuancier" id="nuancier"></div>
+
+    <!-- TITRE -->
+    <section class="screen pad active" id="s-title" data-screen="title">
+      <div class="logo">PIXEL<br>DRAW</div>
+      <canvas id="mascot" width="120" height="120"></canvas>
+      <div class="go">&#9658; TOUCHE ICI POUR COMMENCER</div>
+    </section>
+
+    <!-- SÉLECTION -->
+    <section class="screen pad" id="s-select" data-screen="select">
+      <div class="selhead">
+        <button class="btn" id="selBack">‹ Titre</button>
+        <h2>Choisis ton dessin</h2>
+        <span class="pixel" id="selCounter" style="font-size:9px;color:var(--ink-soft)"></span>
+      </div>
+      <div class="thumbs" id="thumbs"></div>
+      <div class="pager">
+        <button class="btn" id="pgPrev">‹</button>
+        <span class="pixel" id="selPager"></span>
+        <button class="btn" id="pgNext">›</button>
+      </div>
+    </section>
+
+    <!-- JEU -->
+    <section class="screen pad" id="s-game" data-screen="game">
+      <div class="topbar">
+        <button class="btn" id="gmBack">‹ Retour</button>
+        <div class="mid">
+          <div class="pname" id="hudName"></div>
+          <div class="pdiff" id="hudDiff"></div>
+        </div>
+        <div class="rem">restants&nbsp;<span id="hudRemaining">0</span></div>
+      </div>
+      <div class="game-body">
+        <div class="model">
+          <canvas id="modelCanvas"></canvas>
+          <div class="cap"><span id="modelTotal">0</span> pixels</div>
+        </div>
+        <div id="gridWrap"><canvas id="gridCanvas"></canvas></div>
+        <div class="palette" id="palette"></div>
+      </div>
+      <div class="toolbar">
+        <button class="btn tool" id="tErase">🧽 Effacer</button>
+        <button class="btn tool" id="tSolution">👁 Solution</button>
+        <button class="btn" id="tBack">↩ Retour</button>
+        <button class="btn" id="tSolve" style="display:none">⚡ Résoudre</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<canvas id="fxCanvas"></canvas>
+<div id="winOverlay"><div class="wincard">
+  <h2>Terminé ! 🎉</h2>
+  <p>Beau travail.</p>
+  <div class="row">
+    <button class="btn primary" id="winNext">Dessin suivant ›</button>
+    <button class="btn" id="winBack">Sélection</button>
+  </div>
+</div></div>
+<div id="toast"></div>
+
+<script src="assets/js/app.js"></script>
+</body>
+</html>
