@@ -1,7 +1,7 @@
 (function () {
   // ---------- palette & données des dessins (portées depuis alpha/assets/js/app.js) ----------
   var PALETTE = {
-  99:null, 0:'#1a1c2c', 1:'#5d275d', 2:'#b13e53', 3:'#ef7d57', 4:'#ffcd75',
+  99:null, 0:'#08090c', 1:'#5d275d', 2:'#b13e53', 3:'#ef7d57', 4:'#ffcd75',
   5:'#a7f070', 6:'#38b764', 7:'#257179', 8:'#29366f', 9:'#3b5fc9', 10:'#41a6f6',
   11:'#73eff7', 12:'#f4f4f4', 13:'#94b0c2', 14:'#566c86', 15:'#333c57',
   16:'#e9babb', 17:'#f2664c'
@@ -221,6 +221,13 @@
   var refZoomOutBtn = document.getElementById('refZoomOutBtn');
   var gameNameEl = document.getElementById('gameName');
   var gameDiffEl = document.getElementById('gameDiff');
+  var progressCountEl = document.getElementById('progressCount');
+  var progressRemainingEl = document.getElementById('progressRemaining');
+  var progressBarFillEl = document.getElementById('progressBarFill');
+  var progressRingFillEl = document.getElementById('progressRingFill');
+  var progressRingLabelEl = document.getElementById('progressRingLabel');
+  var paletteEdgeLeftEl = document.getElementById('paletteEdgeLeft');
+  var paletteEdgeRightEl = document.getElementById('paletteEdgeRight');
 
   var EMPTY_BG =
     'linear-gradient(45deg, #21232b 25%, transparent 25%, transparent 75%, #21232b 75%),' +
@@ -331,9 +338,13 @@
       item.className = 'swatch-item';
       item.dataset.colorIndex = colorIndex;
 
+      var holder = document.createElement('div');
+      holder.className = 'swatch-holder';
+
       var b = document.createElement('button');
       b.className = 'swatch';
       b.style.background = PALETTE[colorIndex];
+      b.setAttribute('aria-label', 'Couleur');
       if (colorIndex === currentColorIndex) b.classList.add('selected');
       b.addEventListener('click', function () {
         currentColorIndex = colorIndex;
@@ -342,14 +353,22 @@
         markSelected(b);
       });
 
+      var check = document.createElement('span');
+      check.className = 'swatch-check';
+      check.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#8b93a1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+
+      holder.appendChild(b);
+      holder.appendChild(check);
+
       var count = document.createElement('span');
       count.className = 'swatch-count';
 
-      item.appendChild(b);
+      item.appendChild(holder);
       item.appendChild(count);
       paletteEl.appendChild(item);
     });
     updatePaletteCounts();
+    updatePaletteEdges();
   }
 
   function getPlacedCount(colorIndex) {
@@ -369,9 +388,35 @@
       item.querySelector('.swatch-count').textContent = remaining;
       item.classList.toggle('depleted', remaining <= 0);
     });
+    updateProgress();
     checkWin();
     updateSolutionHighlight();
   }
+
+  function updateProgress() {
+    var total = 0;
+    var placed = 0;
+    for (var i = 0; i < SOLUTION.length; i++) {
+      if (SOLUTION[i] === null) continue;
+      total++;
+      if (cells[i] === SOLUTION[i]) placed++;
+    }
+    var percent = total ? Math.round((placed / total) * 100) : 0;
+    progressCountEl.textContent = placed + '/' + total;
+    progressRemainingEl.textContent = (total - placed) + ' restantes';
+    progressBarFillEl.style.width = percent + '%';
+    progressRingFillEl.style.strokeDashoffset = 100 - percent;
+    progressRingLabelEl.textContent = percent + '%';
+  }
+
+  function updatePaletteEdges() {
+    var max = paletteEl.scrollWidth - paletteEl.clientWidth;
+    paletteEdgeLeftEl.classList.toggle('show', paletteEl.scrollLeft > 4);
+    paletteEdgeRightEl.classList.toggle('show', paletteEl.scrollLeft < max - 4);
+  }
+
+  paletteEl.addEventListener('scroll', updatePaletteEdges);
+  window.addEventListener('resize', updatePaletteEdges);
 
   function spawnBurst(cellEl, color, distMin, distMax, glow, implode) {
     if (reduceMotion) return;
@@ -524,7 +569,7 @@
     solutionTimer = setTimeout(updateSolutionHighlight, 3200);
   });
 
-  // --- zoom (grille à colorier + modèle à reproduire) ---
+  // --- zoom desktop (grille à colorier + modèle à reproduire) ---
   var ZOOM_MIN = 0.7;
   var ZOOM_MAX = 1.8;
   var ZOOM_STEP = 0.15;
