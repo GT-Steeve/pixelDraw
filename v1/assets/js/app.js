@@ -74,9 +74,7 @@
   });
 
   function isUnlocked(id){
-    var i = REAL_ORDER.indexOf(id);
-    if(i <= 0) return true;
-    return state.done.has(REAL_ORDER[i-1]);
+    return true; /* tous les puzzles sont débloqués */
   }
   function nextRealId(id){
     var i = REAL_ORDER.indexOf(id);
@@ -134,6 +132,33 @@
       if(v === EMPTY) continue;
       ctx.fillStyle = PALETTE[v];
       ctx.fillRect(c*cell, r*cell, cell, cell);
+    }
+  }
+
+  /* comme paintMini, mais avec les repères arc-en-ciel sur les bords
+     haut/gauche (§2.3) — utilisé pour le modèle à reproduire */
+  function paintModel(cv, grid, box){
+    var rows = grid.length, cols = grid[0].length;
+    var cell = Math.max(1, Math.floor(box / Math.max(rows, cols)));
+    var G = Math.max(3, Math.round(cell * 0.5));
+    var w = G + cols * cell, h = G + rows * cell;
+    var ctx = fitCanvas(cv, w, h);
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = css('--grid-line');
+    ctx.fillRect(0, 0, G, G);
+    for(var c=0;c<cols;c++){
+      ctx.fillStyle = 'hsl(' + ((c*47)%360) + ' 72% 62%)';
+      ctx.fillRect(G + c*cell, 0, cell, G);
+    }
+    for(var r=0;r<rows;r++){
+      ctx.fillStyle = 'hsl(' + ((r*47)%360) + ' 72% 62%)';
+      ctx.fillRect(0, G + r*cell, G, cell);
+    }
+    for(r=0;r<rows;r++) for(c=0;c<cols;c++){
+      var v = grid[r][c];
+      if(v === EMPTY) continue;
+      ctx.fillStyle = PALETTE[v];
+      ctx.fillRect(G + c*cell, G + r*cell, cell, cell);
     }
   }
 
@@ -319,7 +344,7 @@
     state.cell = Math.max(8, Math.min(34, cbyW, cbyH));
     state.guide = Math.max(10, Math.round(state.cell * 0.55));
     drawGrid();
-    paintMini($('#modelCanvas'), p.grid, 128);
+    paintModel($('#modelCanvas'), p.grid, 128);
     renderPalette();
     updateToolbar();
     updateHud();
@@ -336,17 +361,21 @@
     ctx.fillStyle = css('--cell-blank');
     ctx.fillRect(G, G, p.cols * cell, p.rows * cell);
 
-    /* repères arc-en-ciel — hue = (index * 47) % 360 (§2.3) */
+    /* repères arc-en-ciel — hue = (index * 47) % 360 (§2.3)
+       bandes pleines (sans marge) + coin rempli, pour rester bien
+       alignées avec les bords haut/gauche de la grille */
+    var line = css('--grid-line');
+    ctx.fillStyle = line;
+    ctx.fillRect(0, 0, G, G);
     for(var c=0;c<p.cols;c++){
       ctx.fillStyle = 'hsl(' + ((c*47)%360) + ' 72% 62%)';
-      ctx.fillRect(G + c*cell + 1, 1, cell - 2, G - 4);
+      ctx.fillRect(G + c*cell, 0, cell, G);
     }
     for(var r=0;r<p.rows;r++){
       ctx.fillStyle = 'hsl(' + ((r*47)%360) + ' 72% 62%)';
-      ctx.fillRect(1, G + r*cell + 1, G - 4, cell - 2);
+      ctx.fillRect(0, G + r*cell, G, cell);
     }
 
-    var line = css('--grid-line');
     for(r=0;r<p.rows;r++) for(c=0;c<p.cols;c++){
       var v = state.player[r][c];
       var px = G + c*cell, py = G + r*cell;
@@ -504,12 +533,6 @@
   /* ============================================================
      11. Câblage UI
      ============================================================ */
-  PALETTE.forEach(function(c){
-    var i = document.createElement('i');
-    i.style.background = c;
-    $('#nuancier').appendChild(i);
-  });
-
   $('#s-title').addEventListener('click', function(){ show('select'); });
   $('#selBack').addEventListener('click', function(){ show('title'); });
   $('#pgPrev').addEventListener('click', function(){ state.selPage--; renderSelect(); });

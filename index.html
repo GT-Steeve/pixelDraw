@@ -9,46 +9,119 @@
 </head>
 <body>
 
-  <div class="head">
-    <h1>Dessine en pixels</h1>
-    <p>Glisse le doigt sur la grille pour colorier, choisis une teinte ci-dessous.</p>
-  </div>
+  <!-- ÉCRAN TITRE -->
+  <section class="screen screen-title" id="screenTitle" role="button" tabindex="0">
+    <canvas id="titleMascot" class="title-mascot"></canvas>
+    <div class="title-logo">PIXEL<br>DRAW</div>
+    <p class="title-cta">Touche ici pour commencer</p>
+  </section>
 
-  <div class="reference">
-    <span class="reference-label">Modèle à reproduire</span>
-    <div class="ref-grid" id="refGrid"></div>
-    <button class="pill" id="animateBtn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3"/><path d="M12 18v3"/><path d="M4.2 4.2l2.1 2.1"/><path d="M17.7 17.7l2.1 2.1"/><path d="M3 12h3"/><path d="M18 12h3"/><path d="M4.2 19.8l2.1-2.1"/><path d="M17.7 6.3l2.1-2.1"/><circle cx="12" cy="12" r="3"/></svg>
-      Animer l’éclosion
-    </button>
-  </div>
+  <!-- ÉCRAN SÉLECTION -->
+  <section class="screen screen-select" id="screenSelect" hidden>
+    <div class="select-head">
+      <button class="pill" id="selectBackBtn">‹ Titre</button>
+      <h2>Choisis ton dessin</h2>
+      <span class="select-counter" id="selectCounter"></span>
+    </div>
+    <div class="puzzle-grid" id="puzzleGrid"></div>
 
-  <div class="stage">
-    <div class="board">
-      <div class="grid" id="grid"></div>
+    <div class="pager">
+      <button class="pill icon-only" id="pagePrevBtn" title="Page précédente" aria-label="Page précédente">‹</button>
+      <span class="page-indicator" id="pageIndicator"></span>
+      <button class="pill icon-only" id="pageNextBtn" title="Page suivante" aria-label="Page suivante">›</button>
+    </div>
+  </section>
+
+  <!-- ÉCRAN DE JEU -->
+  <section class="screen screen-game" id="screenGame" hidden>
+
+    <div class="game-head">
+      <button class="pill" id="gameBackBtn">‹ Sélection</button>
+      <div class="game-title">
+        <span class="game-name" id="gameName"></span>
+        <span class="game-diff" id="gameDiff"></span>
+      </div>
     </div>
 
-    <div class="palette" id="palette"></div>
+    <div class="hint" id="hint">
+      <p>💡 Repère-toi avec les bandes de couleur sur les bords : la même position entre le modèle et la grille vierge indique où poser chaque couleur.</p>
+      <button class="hint-close" id="hintClose" aria-label="Fermer l'astuce" title="Fermer l'astuce">×</button>
+    </div>
 
-    <div class="toolbar">
-      <button class="pill" id="undoBtn" title="Annuler">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h10a5 5 0 0 1 0 10H8"/><polyline points="7 5 3 10 7 15"/></svg>
-        Annuler
-      </button>
-      <button class="pill eraser" id="eraserBtn" title="Gomme">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H8l-6-6a2 2 0 0 1 0-2.8l9-9a2 2 0 0 1 2.8 0l6 6a2 2 0 0 1 0 2.8L13 18"/></svg>
-        Gomme
-      </button>
-      <button class="pill" id="clearBtn" title="Tout effacer">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-        Effacer
-      </button>
-      <button class="pill" id="downloadBtn" title="Télécharger">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><polyline points="7 11 12 16 17 11"/><path d="M5 20h14"/></svg>
-        Télécharger
-      </button>
+    <div class="reference">
+      <span class="reference-label">Modèle à reproduire</span>
+      <div class="reference-row">
+        <div class="ref-board">
+          <div class="board-grid">
+            <div class="guide-corner"></div>
+            <div class="guide-top" id="refGuideTop"></div>
+            <div class="guide-left" id="refGuideLeft"></div>
+            <div class="ref-grid" id="refGrid"></div>
+          </div>
+        </div>
+
+        <div class="zoom-controls">
+          <button class="pill icon-only" id="refZoomInBtn" title="Zoom avant" aria-label="Zoom avant">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </button>
+          <button class="pill icon-only" id="refZoomOutBtn" title="Zoom arrière" aria-label="Zoom arrière">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="board-row">
+        <div class="board">
+          <div class="board-grid">
+            <div class="guide-corner"></div>
+            <div class="guide-top" id="guideTop"></div>
+            <div class="guide-left" id="guideLeft"></div>
+            <div class="grid" id="grid"></div>
+          </div>
+        </div>
+
+        <div class="zoom-controls">
+          <button class="pill icon-only" id="zoomInBtn" title="Zoom avant" aria-label="Zoom avant">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </button>
+          <button class="pill icon-only" id="zoomOutBtn" title="Zoom arrière" aria-label="Zoom arrière">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="palette" id="palette"></div>
+
+      <div class="toolbar">
+        <button class="pill eraser" id="eraserBtn" title="Gomme">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H8l-6-6a2 2 0 0 1 0-2.8l9-9a2 2 0 0 1 2.8 0l6 6a2 2 0 0 1 0 2.8L13 18"/></svg>
+          Gomme
+        </button>
+        <button class="pill" id="solutionBtn" title="Solution">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
+          Solution
+        </button>
+      </div>
+    </div>
+  </section>
+
+<canvas id="fxCanvas"></canvas>
+<div class="win-overlay" id="winOverlay">
+  <div class="win-card">
+    <h2>Terminé ! 🎉</h2>
+    <p id="winMessage">Bravo, le dessin est complet.</p>
+    <div class="win-actions">
+      <button class="pill primary" id="winNextBtn">Dessin suivant ›</button>
+      <div class="row">
+        <button class="pill" id="winRestartBtn">Recommencer</button>
+        <button class="pill" id="winSelectBtn">Sélection</button>
+      </div>
     </div>
   </div>
+</div>
+<div class="toast" id="toast"></div>
 
 <script src="assets/js/app.js"></script>
 </body>

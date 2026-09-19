@@ -1,3 +1,7 @@
 Prototype
 v0.00.1 = first commit
 v0.00.2 = intégration ancien version
+v0.00.3 = fusion des ancien version + Zoom
+
+** FEATURE EN PAUSE **
+imprimer la grille

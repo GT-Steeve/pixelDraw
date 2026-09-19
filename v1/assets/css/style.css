@@ -24,8 +24,6 @@
   .wrap{width:100%; max-width:760px}
   .card{background:var(--card); border:1px solid var(--line); border-radius:22px;
     overflow:hidden; box-shadow:var(--shadow)}
-  .nuancier{display:flex; height:10px}
-  .nuancier i{flex:1}
   .pad{padding:22px 20px 26px}
 
   h1,h2{font-family:'Baloo 2',cursive; margin:0}
