@@ -63,8 +63,6 @@
     var wCss = cols * cell, hCss = rows * cell;
     canvas.width = Math.round(wCss * d);
     canvas.height = Math.round(hCss * d);
-    canvas.style.width = wCss + 'px';
-    canvas.style.height = hCss + 'px';
     var ctx = canvas.getContext('2d');
     ctx.setTransform(d, 0, 0, d, 0, 0);
     ctx.imageSmoothingEnabled = false;
@@ -112,41 +110,89 @@
 
   // ---------- écran sélection ----------
   var puzzleGridEl = document.getElementById('puzzleGrid');
-  var selectCounterEl = document.getElementById('selectCounter');
+  var selectProgressRingFillEl = document.getElementById('selectProgressRingFill');
+  var selectProgressRingLabelEl = document.getElementById('selectProgressRingLabel');
   var pagePrevBtn = document.getElementById('pagePrevBtn');
   var pageNextBtn = document.getElementById('pageNextBtn');
-  var pageIndicatorEl = document.getElementById('pageIndicator');
+  var pageDotsEl = document.getElementById('pageDots');
   var currentPage = 0;
+
+  var LOCK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+
+  var DIFF_GEM_COLOR = { Easy: '#3ddc6a', Normal: '#f4c430', Hard: '#ef4a4a' };
+
+  function shadeColor(hex, percent) {
+    var num = parseInt(hex.replace('#', ''), 16);
+    var r = (num >> 16) & 0xff, g = (num >> 8) & 0xff, b = num & 0xff;
+    var mix = function (c) { return percent >= 0 ? c + (255 - c) * percent : c + c * percent; };
+    r = Math.max(0, Math.min(255, Math.round(mix(r))));
+    g = Math.max(0, Math.min(255, Math.round(mix(g))));
+    b = Math.max(0, Math.min(255, Math.round(mix(b))));
+    return '#' + [r, g, b].map(function (v) { return ('0' + v.toString(16)).slice(-2); }).join('');
+  }
+
+  function diamondRowWidths(radius) {
+    var rows = [];
+    for (var i = 0; i <= 2 * radius; i++) {
+      rows.push(2 * (radius - Math.abs(i - radius)) + 1);
+    }
+    return rows;
+  }
+
+  function buildPixelGem(base) {
+    var hi = shadeColor(base, 0.4);
+    var lo = shadeColor(base, -0.35);
+    var cell = 2;
+    var outerR = 4, innerR = 3;
+    var outerRows = diamondRowWidths(outerR);
+    var innerRows = diamondRowWidths(innerR);
+    var gridSize = 2 * outerR + 1;
+    var size = gridSize * cell;
+    var rects = '';
+    outerRows.forEach(function (w, i) {
+      var x = (gridSize - w) / 2 * cell;
+      rects += '<rect x="' + x + '" y="' + (i * cell) + '" width="' + (w * cell) + '" height="' + cell + '" fill="#05070a"/>';
+    });
+    var offset = outerR - innerR;
+    innerRows.forEach(function (w, i) {
+      var color = i <= 1 ? hi : (i >= innerRows.length - 2 ? lo : base);
+      var x = (gridSize - w) / 2 * cell;
+      rects += '<rect x="' + x + '" y="' + ((i + offset) * cell) + '" width="' + (w * cell) + '" height="' + cell + '" fill="' + color + '"/>';
+    });
+    return '<svg viewBox="0 0 ' + size + ' ' + size + '" shape-rendering="crispEdges">' + rects + '</svg>';
+  }
 
   function renderRealCard(card, puzzle) {
     var done = isCompleted(puzzle.id);
     var unlocked = isUnlocked(puzzle.id);
     card.classList.toggle('locked', !unlocked);
+    puzzleGridEl.appendChild(card);
+
+    var thumb = document.createElement('div');
+    thumb.className = 'puzzle-thumb';
+    card.appendChild(thumb);
 
     if (unlocked) {
       var canvas = document.createElement('canvas');
-      card.appendChild(canvas);
-      puzzleGridEl.appendChild(card);
-      drawThumb(canvas, puzzle.grid, puzzle.rows, puzzle.cols, 92);
+      thumb.appendChild(canvas);
+      drawThumb(canvas, puzzle.grid, puzzle.rows, puzzle.cols, 168);
+
+      var gem = document.createElement('div');
+      gem.className = 'puzzle-gem';
+      gem.title = puzzle.difficulty;
+      gem.innerHTML = buildPixelGem(DIFF_GEM_COLOR[puzzle.difficulty] || DIFF_GEM_COLOR.Easy);
+      thumb.appendChild(gem);
     } else {
       var placeholder = document.createElement('div');
       placeholder.className = 'puzzle-locked-box';
-      placeholder.textContent = '🔒';
-      card.appendChild(placeholder);
-      puzzleGridEl.appendChild(card);
+      placeholder.innerHTML = LOCK_ICON;
+      thumb.appendChild(placeholder);
     }
 
     var nameEl = document.createElement('span');
     nameEl.className = 'puzzle-name';
     nameEl.textContent = puzzle.name;
     card.appendChild(nameEl);
-
-    if (unlocked) {
-      var diffEl = document.createElement('span');
-      diffEl.className = 'puzzle-diff';
-      diffEl.textContent = puzzle.difficulty;
-      card.appendChild(diffEl);
-    }
 
     if (done) {
       var badge = document.createElement('div');
@@ -171,10 +217,27 @@
     });
   }
 
+  function renderPageDots() {
+    pageDotsEl.innerHTML = '';
+    PAGES.forEach(function (_, i) {
+      var dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'page-dot' + (i === currentPage ? ' active' : '');
+      dot.setAttribute('aria-label', 'Page ' + (i + 1));
+      dot.addEventListener('click', function () {
+        currentPage = i;
+        renderSelect();
+      });
+      pageDotsEl.appendChild(dot);
+    });
+  }
+
   function renderSelect() {
     currentPage = Math.max(0, Math.min(currentPage, PAGES.length - 1));
-    selectCounterEl.textContent = progress.completed.length + ' / ' + PUZZLES.length + ' terminés';
-    pageIndicatorEl.textContent = (currentPage + 1) + ' / ' + PAGES.length;
+    var overallPercent = PUZZLES.length ? Math.round(progress.completed.length / PUZZLES.length * 100) : 0;
+    selectProgressRingFillEl.style.strokeDashoffset = 100 - overallPercent;
+    selectProgressRingLabelEl.textContent = overallPercent + '%';
+    renderPageDots();
     pagePrevBtn.disabled = currentPage === 0;
     pageNextBtn.disabled = currentPage === PAGES.length - 1;
 
