@@ -4,6 +4,7 @@ v0.00.2 = intégration ancien version
 v0.00.3 = fusion des ancien version + Zoom
 v0.00.4 = polish UI Phase dessin sur mobile + bureau
 v0.00.5 = polish UI phase selection puzzle
+v0.00.6 = ajout theme light
 
 ** FEATURE EN PAUSE **
 imprimer la grille

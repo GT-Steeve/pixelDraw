@@ -86,6 +86,36 @@
     toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 1800);
   }
 
+  // ---------- thème clair / sombre ----------
+  var THEME_KEY = 'pixelDraw:theme';
+  var themeToggleBtn = document.getElementById('themeToggleBtn');
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    try { localStorage.setItem(THEME_KEY, theme); } catch (e) { /* stockage indisponible */ }
+  }
+
+  themeToggleBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  var themeToggleHome = themeToggleBtn.parentNode;
+
+  function placeThemeToggle(name) {
+    var header = name === 'select' ? document.querySelector('.select-head')
+      : name === 'game' ? document.querySelector('.game-head')
+      : null;
+    if (header) {
+      header.insertBefore(themeToggleBtn, header.children[1] || null);
+      themeToggleBtn.classList.add('in-header');
+    } else {
+      themeToggleHome.appendChild(themeToggleBtn);
+      themeToggleBtn.classList.remove('in-header');
+    }
+  }
+
   // ---------- navigation entre écrans ----------
   var screens = {
     title: document.getElementById('screenTitle'),
@@ -94,6 +124,7 @@
   };
   function showScreen(name) {
     Object.keys(screens).forEach(function (k) { screens[k].hidden = (k !== name); });
+    placeThemeToggle(name);
   }
 
   // ---------- écran titre ----------
@@ -292,10 +323,6 @@
   var paletteEdgeLeftEl = document.getElementById('paletteEdgeLeft');
   var paletteEdgeRightEl = document.getElementById('paletteEdgeRight');
 
-  var EMPTY_BG =
-    'linear-gradient(45deg, #21232b 25%, transparent 25%, transparent 75%, #21232b 75%),' +
-    'linear-gradient(45deg, #21232b 25%, transparent 25%, transparent 75%, #21232b 75%)';
-
   var currentPuzzle = null;
   var cells = [];
   var SOLUTION = [];
@@ -379,7 +406,7 @@
   function drawReferenceModel(els, solution) {
     for (var i = 0; i < els.length; i++) {
       var v = solution[i];
-      els[i].style.backgroundColor = (v === null || v === undefined) ? '#1a1c22' : PALETTE[v];
+      els[i].style.backgroundColor = (v === null || v === undefined) ? '' : PALETTE[v];
     }
   }
 
@@ -665,7 +692,7 @@
     cells[index] = null;
     var el = gridEl.children[index];
     el.style.backgroundColor = '';
-    el.style.backgroundImage = EMPTY_BG;
+    el.style.backgroundImage = '';
     spawnBurst(el, PALETTE[prevValue], 18, 32, false, true);
     updatePaletteCounts();
   }
